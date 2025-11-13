@@ -1,25 +1,52 @@
+import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import './Navbar.css'
 
 function Navbar() {
   const location = useLocation()
+  const [isScrolled, setIsScrolled] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const isActive = (path) => location.pathname === path
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  useEffect(() => {
+    setIsMobileMenuOpen(false)
+  }, [location])
+
   return (
-    <nav className="navbar">
+    <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
       <div className="container navbar-container">
         <Link to="/" className="navbar-logo">
           <span className="logo-icon">🎨</span>
           <span className="logo-text">Decor Design</span>
         </Link>
 
-        <ul className="navbar-menu">
+        <button
+          className={`mobile-menu-toggle ${isMobileMenuOpen ? 'open' : ''}`}
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label="Toggle menu"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <ul className={`navbar-menu ${isMobileMenuOpen ? 'open' : ''}`}>
           <li>
             <Link
               to="/"
               className={`nav-link ${isActive('/') ? 'active' : ''}`}
             >
+              <span className="nav-icon">🏠</span>
               Home
             </Link>
           </li>
@@ -28,6 +55,7 @@ function Navbar() {
               to="/generate"
               className={`nav-link ${isActive('/generate') ? 'active' : ''}`}
             >
+              <span className="nav-icon">✨</span>
               Generate Image
             </Link>
           </li>
@@ -36,6 +64,7 @@ function Navbar() {
               to="/video"
               className={`nav-link ${isActive('/video') ? 'active' : ''}`}
             >
+              <span className="nav-icon">🎬</span>
               Generate Video
             </Link>
           </li>
@@ -44,6 +73,7 @@ function Navbar() {
               to="/gallery"
               className={`nav-link ${isActive('/gallery') ? 'active' : ''}`}
             >
+              <span className="nav-icon">🖼️</span>
               Gallery
             </Link>
           </li>
