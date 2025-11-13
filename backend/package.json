@@ -6,7 +6,9 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "setup": "node setup.js",
+    "postinstall": "node setup.js"
   },
   "keywords": ["ai", "furniture", "image-generation", "video-generation"],
   "author": "",

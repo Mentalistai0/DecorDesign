@@ -48,7 +48,18 @@ DecorDesign/
    cd backend
    npm install
    ```
-4. Configure environment variables (see `.env.example` in each folder)
+4. Configure environment variables:
+   ```bash
+   # Backend
+   cd backend
+   cp .env.example .env
+   # Edit .env with your API keys if needed
+
+   # Frontend (if .env.example exists)
+   cd ../frontend
+   cp .env.example .env
+   # Edit .env if needed
+   ```
 5. Start the development servers:
    ```bash
    # Terminal 1 - Backend
