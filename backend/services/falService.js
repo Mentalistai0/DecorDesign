@@ -4,57 +4,73 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 // Configure Fal.ai client
-if (process.env.FAL_API_KEY) {
-  fal.config({
-    credentials: process.env.FAL_API_KEY,
-  })
-} else {
+// The @fal-ai/client library reads credentials from FAL_KEY environment variable
+// or we can pass it explicitly in the subscribe call
+if (!process.env.FAL_API_KEY) {
   console.warn('⚠️  FAL_API_KEY not found in environment variables')
   console.warn('⚠️  AI generation features will not work. Please configure FAL_API_KEY')
 }
 
 /**
- * Generate an image using Fal.ai's Nano Banana model
+ * Generate/edit an image using Fal.ai's Nano Banana Edit model (Gemini 2.5 Flash Image)
  * @param {Object} params - Generation parameters
- * @param {string} params.imageUrl - URL of the input image
- * @param {string} params.prompt - Text prompt for generation
+ * @param {string|string[]} params.imageUrl - URL(s) of the input image(s)
+ * @param {string} params.prompt - Text prompt for image editing
+ * @param {number} [params.numImages=1] - Number of images to generate
+ * @param {string} [params.aspectRatio='auto'] - Aspect ratio of the generated image
+ * @param {string} [params.outputFormat='png'] - Output format (jpeg, png, webp)
  * @returns {Promise<Object>} Generated image result
  */
-export async function generateImage({ imageUrl, prompt }) {
+export async function generateImage({
+  imageUrl,
+  prompt,
+  numImages = 1,
+  aspectRatio = 'auto',
+  outputFormat = 'png'
+}) {
   try {
     if (!process.env.FAL_API_KEY) {
       throw new Error('FAL_API_KEY is not configured')
     }
 
-    console.log('Calling Fal.ai Nano Banana model...')
+    console.log('Calling Fal.ai Nano Banana Edit model (Gemini 2.5 Flash Image)...')
 
-    // Call Fal.ai's Nano Banana model
-    // Model ID: fal-ai/nano-banana
-    const result = await fal.subscribe('fal-ai/nano-banana', {
+    // Convert imageUrl to array if it's a single string
+    const imageUrls = Array.isArray(imageUrl) ? imageUrl : [imageUrl]
+
+    // Call Fal.ai's Nano Banana Edit model
+    // Model ID: fal-ai/nano-banana/edit
+    const result = await fal.subscribe('fal-ai/nano-banana/edit', {
       input: {
-        image_url: imageUrl,
         prompt: prompt,
+        image_urls: imageUrls,
+        num_images: numImages,
+        aspect_ratio: aspectRatio,
+        output_format: outputFormat,
       },
       logs: true,
+      credentials: process.env.FAL_API_KEY,
       onQueueUpdate: (update) => {
         if (update.status === 'IN_PROGRESS') {
-          console.log('Generation in progress...')
+          console.log('Image generation in progress...')
+          if (update.logs) {
+            update.logs.forEach((log) => console.log(log.message))
+          }
         }
       },
     })
 
     console.log('Image generation completed')
 
-    // Extract the generated image URL from the result
-    const generatedImageUrl = result.images?.[0]?.url || result.image?.url
-
-    if (!generatedImageUrl) {
-      throw new Error('No image URL in response')
+    // Extract the generated images from the result
+    if (!result.images || result.images.length === 0) {
+      throw new Error('No images in response')
     }
 
     return {
-      imageUrl: generatedImageUrl,
-      ...result,
+      images: result.images,
+      description: result.description || '',
+      imageUrl: result.images[0].url, // Primary image URL for backward compatibility
     }
   } catch (error) {
     console.error('Fal.ai image generation error:', error)
@@ -85,6 +101,7 @@ export async function generateVideo({ imageUrl, prompt }) {
         prompt: prompt,
       },
       logs: true,
+      credentials: process.env.FAL_API_KEY,
       onQueueUpdate: (update) => {
         if (update.status === 'IN_PROGRESS') {
           console.log('Video generation in progress...')
