@@ -1,34 +1,66 @@
 .video-page {
-  padding: 40px 0;
+  padding: var(--space-3xl) 0;
   min-height: calc(100vh - 80px);
+  animation: fadeIn 0.6s ease-out;
 }
 
 .generation-notice {
-  background-color: #fffbeb;
-  border: 1px solid #fbbf24;
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 20px;
+  background: var(--warning-light);
+  border: 2px solid var(--warning);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+  margin-bottom: var(--space-xl);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  animation: slideInDown 0.4s ease-out;
+}
+
+.generation-notice::before {
+  content: '⏱️';
+  font-size: var(--text-2xl);
+  flex-shrink: 0;
 }
 
 .generation-notice p {
   margin: 0;
-  color: #92400e;
-  font-size: 14px;
-  line-height: 1.5;
+  color: var(--warning);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  line-height: 1.6;
 }
 
 .loading-subtext {
-  font-size: 14px;
-  color: var(--text-secondary);
-  margin-top: 8px;
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  margin-top: var(--space-sm);
+  font-weight: 500;
 }
 
 .generated-video {
   width: 100%;
-  border-radius: 8px;
-  margin-bottom: 20px;
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-xl);
   background-color: #000;
+  box-shadow: var(--shadow-xl);
+  animation: zoomIn 0.6s ease-out;
+  transition: transform 0.3s ease;
+}
+
+.generated-video:hover {
+  transform: scale(1.01);
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5);
+}
+
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* Inherit other styles from GeneratePage.css */
