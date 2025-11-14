@@ -112,7 +112,13 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' })
 })
 
-app.listen(PORT, () => {
-  console.log(`🚀 Decor Design API server running on port ${PORT}`)
-  console.log(`📝 Health check: http://localhost:${PORT}/health`)
-})
+// Do not call app.listen() in serverless environment (Vercel will handle it)
+if (process.env.VERCEL !== '1' && process.env.VERCEL !== 'true') {
+  app.listen(PORT, () => {
+    console.log(`🚀 Decor Design API server running on port ${PORT}`)
+    console.log(`📝 Health check: http://localhost:${PORT}/health`)
+  })
+}
+
+// Export the Express app for Vercel Serverless Functions
+export default app
