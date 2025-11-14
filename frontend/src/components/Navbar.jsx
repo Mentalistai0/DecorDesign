@@ -6,7 +6,7 @@ import './Navbar.css'
 function Navbar() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { user, isAuthenticated, logout } = useAuth()
+  const { user, isAuthenticated, logout, credits } = useAuth()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
@@ -85,8 +85,29 @@ function Navbar() {
               Gallery
             </Link>
           </li>
+          <li>
+            <Link
+              to="/pricing"
+              className={`nav-link ${isActive('/pricing') ? 'active' : ''}`}
+            >
+              <span className="nav-icon">💳</span>
+              Pricing
+            </Link>
+          </li>
           {isAuthenticated ? (
             <>
+              <li className="nav-credits">
+                <div className="credits-display">
+                  <div className="credit-item">
+                    <span className="credit-icon">🖼️</span>
+                    <span className="credit-value">{credits.image.available}</span>
+                  </div>
+                  <div className="credit-item">
+                    <span className="credit-icon">🎬</span>
+                    <span className="credit-value">{credits.video.available}</span>
+                  </div>
+                </div>
+              </li>
               <li className="nav-user-info">
                 <span className="user-name">{user?.name || user?.email}</span>
               </li>
