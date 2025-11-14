@@ -5,7 +5,10 @@
       "Bash(kill:*)",
       "Bash(brew install:*)",
       "Bash(stripe version:*)",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)"
     ],
     "deny": [],
     "ask": []
