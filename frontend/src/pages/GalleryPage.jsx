@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import API_URL from '../config/api.js'
 import './GalleryPage.css'
 
 function GalleryPage() {
@@ -22,8 +23,8 @@ function GalleryPage() {
 
     try {
       const [imagesRes, videosRes] = await Promise.all([
-        axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/gallery`),
-        axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/videos`),
+        axios.get(`${API_URL}/api/gallery`),
+        axios.get(`${API_URL}/api/videos`),
       ])
 
       const toArray = (payload) => {
@@ -57,7 +58,7 @@ function GalleryPage() {
     try {
       const endpoint = type === 'image' ? 'gallery' : 'videos'
       await axios.delete(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/${endpoint}/${id}`
+        `${API_URL}/api/${endpoint}/${id}`
       )
 
       if (type === 'image') {

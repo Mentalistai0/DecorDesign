@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import axios from 'axios'
+import API_URL from '../config/api.js'
 import { videoPromptTemplates } from '../utils/promptTemplates'
 import LoadingSpinner from '../components/LoadingSpinner'
 import './VideoPage.css'
@@ -92,7 +93,7 @@ function VideoPage() {
       formData.append('duration', String(durationSec))
 
       const response = await axios.post(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/generate-video`,
+        `${API_URL}/api/generate-video`,
         formData,
         {
           headers: {

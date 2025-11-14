@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LoadingSpinner from '../components/LoadingSpinner';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import API_URL from '../config/api.js';
 
 export default function PaymentSuccessPage() {
   const navigate = useNavigate();

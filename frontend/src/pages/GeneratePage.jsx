@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import axios from 'axios'
+import API_URL from '../config/api.js'
 import { imagePromptTemplates } from '../utils/promptTemplates'
 import LoadingSpinner from '../components/LoadingSpinner'
 import './GeneratePage.css'
@@ -90,7 +91,7 @@ function GeneratePage() {
       formData.append('prompt', prompt)
 
       const response = await axios.post(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/generate-image`,
+        `${API_URL}/api/generate-image`,
         formData,
         {
           headers: {
