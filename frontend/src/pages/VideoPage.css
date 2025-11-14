@@ -26,7 +26,7 @@
   left: -30%;
   width: 160%;
   height: 160%;
-  background: radial-gradient(circle, rgba(0,212,255,0.05) 0%, transparent 60%);
+  background: radial-gradient(circle, rgba(124,58,237,0.06) 0%, transparent 60%);
   animation: float 30s ease-in-out infinite;
 }
 
@@ -113,13 +113,13 @@
 .card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-xl);
-  border-color: rgba(0, 212, 255, 0.3);
+  border-color: var(--primary-300);
 }
 
 .card h2 {
   font-size: var(--text-2xl);
   margin-bottom: var(--space-lg);
-  color: #E6EAF2;
+  color: var(--text-primary);
   font-weight: 700;
   position: relative;
 }
@@ -139,7 +139,7 @@
   display: flex;
   gap: var(--space-xs);
   margin-bottom: var(--space-lg);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--background-secondary);
   padding: var(--space-xs);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-inner);
@@ -168,18 +168,8 @@
   transition: opacity 0.3s ease;
 }
 
-.tab:hover {
-  color: var(--primary-color);
-  background: rgba(0, 212, 255, 0.08);
-  transform: translateY(-2px);
-}
-
-.tab.active {
-  background: var(--gradient-primary);
-  color: white;
-  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.35);
-  transform: scale(1.02);
-}
+.tab:hover { color: var(--primary-color); background: var(--primary-50); transform: translateY(-2px); }
+.tab.active { background: var(--gradient-primary); color: #fff; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.35); transform: scale(1.02); }
 
 .tab.active::before {
   opacity: 0.2;
@@ -216,9 +206,9 @@
 .input-group textarea:focus,
 .input-group select:focus {
   outline: none;
-  border-color: var(--teal);
+  border-color: var(--primary-400);
   background: white;
-  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
   transform: translateY(-2px);
 }
 
@@ -234,9 +224,18 @@
 }
 
 .image-preview:hover {
-  border-color: var(--teal);
-  box-shadow: 0 8px 25px rgba(0, 212, 255, 0.2);
+  border-color: var(--primary-300);
+  box-shadow: 0 8px 25px rgba(124, 58, 237, 0.2);
   transform: scale(1.02);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .generate-output { position: static; }
+}
+
+@media (max-width: 968px) {
+  .generate-layout { grid-template-columns: 1fr; }
 }
 
 .image-preview img {

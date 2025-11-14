@@ -3,8 +3,8 @@ import { upload } from '../config/multer.js'
 import { generateVideo } from '../services/falService.js'
 import { supabase } from '../config/supabase.js'
 import { generationLimiter, validateVideoGeneration } from '../middleware/security.js'
-import { requireAuth } from '../middleware/auth.js'
-import { checkVideoCredits, deductCredits } from '../middleware/creditMiddleware.js'
+import { authenticate } from '../middleware/auth.js'
+import { checkVideoCredits, deductCredits, refundCredits } from '../middleware/creditMiddleware.js'
 import fs from 'fs'
 
 const router = express.Router()
@@ -12,12 +12,13 @@ const router = express.Router()
 router.post(
   '/generate-video',
   generationLimiter,
-  requireAuth,
+  authenticate,
   upload.single('image'),
   validateVideoGeneration,
   checkVideoCredits,
   async (req, res) => {
     let videoId = null;
+    let creditsDeducted = false;
 
     try {
       const { prompt, imageUrl, resolution = 'auto', aspect_ratio = 'auto', duration = 4, delete_video = true } = req.body
@@ -30,6 +31,23 @@ router.post(
 
       if (!imageFile && !imageUrl) {
         return res.status(400).json({ error: 'Image file or URL is required' })
+      }
+
+      // CRITICAL FIX: Deduct credits BEFORE generation to prevent race condition
+      console.log(`Deducting ${req.creditsRequired.amount} video credits from user ${userId}`);
+      creditsDeducted = await deductCredits(
+        userId,
+        'video',
+        req.creditsRequired.amount,
+        null, // No reference ID yet, will be updated after generation
+        `Video generation (pending, ${req.creditsRequired.duration}s): ${prompt.substring(0, 100)}`
+      );
+
+      if (!creditsDeducted) {
+        return res.status(500).json({
+          error: 'Failed to reserve credits',
+          message: 'Unable to process your request. Please try again.',
+        });
       }
 
       // Prepare image input for Fal.ai
@@ -85,25 +103,6 @@ router.post(
         }
       }
 
-      // Deduct credits after successful generation
-      try {
-        const deducted = await deductCredits(
-          userId,
-          'video',
-          req.creditsRequired.amount,
-          videoId,
-          `Video generation (${finalDuration}s): ${prompt.substring(0, 100)}`
-        );
-
-        if (!deducted) {
-          console.error('Failed to deduct credits');
-          // Note: Video was already generated, but we log the credit deduction failure
-        }
-      } catch (creditError) {
-        console.error('Error deducting credits:', creditError);
-        // Continue anyway since video was successfully generated
-      }
-
       // Clean up uploaded file if exists
       if (imageFile) {
         try {
@@ -122,6 +121,17 @@ router.post(
       })
     } catch (error) {
       console.error('Video generation error:', error)
+
+      // CRITICAL FIX: Refund credits if generation failed
+      if (creditsDeducted) {
+        console.log(`Refunding ${req.creditsRequired.amount} video credits to user ${req.user.id}`);
+        await refundCredits(
+          req.user.id,
+          'video',
+          req.creditsRequired.amount,
+          `Generation failed: ${error.message}`
+        );
+      }
 
       // Clean up uploaded file on error
       if (req.file) {

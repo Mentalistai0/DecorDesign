@@ -1,0 +1,7 @@
+.legal-page { background: var(--background); }
+.legal-wrap { padding: var(--space-3xl) 0; max-width: 800px; }
+.muted { color: var(--text-tertiary); margin-bottom: var(--space-xl); }
+.legal-section { margin: var(--space-2xl) 0; }
+.legal-section h2 { margin-bottom: var(--space-md); }
+.legal-section p { color: var(--text-secondary); }
+

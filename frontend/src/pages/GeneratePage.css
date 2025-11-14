@@ -210,12 +210,7 @@
   opacity: 1;
 }
 
-.output-card {
-  min-height: 600px;
-  display: flex;
-  flex-direction: column;
-  background: linear-gradient(to bottom right, var(--surface), white);
-}
+.output-card { min-height: 600px; display: flex; flex-direction: column; background: linear-gradient(to bottom right, var(--surface), var(--background-secondary)); }
 
 .loading-container {
   flex: 1;
@@ -351,4 +346,50 @@
   .result-actions .btn {
     width: 100%;
   }
+}
+
+/* Curvy, purple file input */
+#image-upload {
+  border-radius: var(--radius-xl);
+  border: 2px dashed var(--primary-400);
+  background: linear-gradient(135deg, rgba(124,58,237,0.08), transparent);
+  color: var(--text-secondary);
+}
+
+/* Style the file selection button (modern browsers) */
+#image-upload::file-selector-button {
+  background: var(--gradient-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-full);
+  padding: var(--space-sm) var(--space-lg);
+  margin-right: var(--space-md);
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.25);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+#image-upload::file-selector-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(124, 58, 237, 0.32);
+}
+
+/* WebKit compatibility */
+#image-upload::-webkit-file-upload-button {
+  background: var(--gradient-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-full);
+  padding: var(--space-sm) var(--space-lg);
+  margin-right: var(--space-md);
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.25);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+#image-upload::-webkit-file-upload-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(124, 58, 237, 0.32);
 }

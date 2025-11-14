@@ -1,4 +1,4 @@
-import supabase from '../config/supabase.js';
+import { supabase, supabaseAdmin } from '../config/supabase.js';
 
 /**
  * Get user's credit information
@@ -6,7 +6,7 @@ import supabase from '../config/supabase.js';
  * @returns {Promise<Object>} User's credit information
  */
 export async function getUserCredits(userId) {
-  const { data, error } = await supabase
+  const { data, error} = await supabaseAdmin
     .from('user_credits')
     .select('*')
     .eq('user_id', userId)
@@ -115,7 +115,7 @@ export async function addCredits(userId, imageCredits, videoCredits, transaction
  * @returns {Promise<void>}
  */
 export async function initializeUserCredits(userId) {
-  const { error } = await supabase
+  const { error } = await supabaseAdmin
     .from('user_credits')
     .insert({
       user_id: userId,
@@ -138,7 +138,7 @@ export async function initializeUserCredits(userId) {
  * @returns {Promise<Array>} Array of transactions
  */
 export async function getCreditTransactions(userId, limit = 50, offset = 0) {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('credit_transactions')
     .select('*')
     .eq('user_id', userId)
@@ -157,7 +157,7 @@ export async function getCreditTransactions(userId, limit = 50, offset = 0) {
  * @returns {Promise<Array>} Array of active plans
  */
 export async function getPlans() {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('plans')
     .select('*')
     .eq('is_active', true)
@@ -176,7 +176,7 @@ export async function getPlans() {
  * @returns {Promise<Object>} Plan details
  */
 export async function getPlanById(planId) {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('plans')
     .select('*')
     .eq('id', planId)
@@ -197,7 +197,7 @@ export async function getPlanById(planId) {
  * @returns {Promise<void>}
  */
 export async function updateStripeCustomerId(userId, stripeCustomerId) {
-  const { error } = await supabase
+  const { error } = await supabaseAdmin
     .from('user_credits')
     .upsert({
       user_id: userId,
@@ -217,7 +217,7 @@ export async function updateStripeCustomerId(userId, stripeCustomerId) {
  * @returns {Promise<Object>} Created payment record
  */
 export async function recordPayment(paymentData) {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('stripe_payments')
     .insert(paymentData)
     .select()
@@ -243,7 +243,7 @@ export async function updatePaymentStatus(paymentIntentId, status, errorMessage 
     updateData.error_message = errorMessage;
   }
 
-  const { error } = await supabase
+  const { error } = await supabaseAdmin
     .from('stripe_payments')
     .update(updateData)
     .eq('stripe_payment_intent_id', paymentIntentId);
@@ -259,7 +259,7 @@ export async function updatePaymentStatus(paymentIntentId, status, errorMessage 
  * @returns {Promise<void>}
  */
 export async function markCreditsAllocated(paymentIntentId) {
-  const { error } = await supabase
+  const { error } = await supabaseAdmin
     .from('stripe_payments')
     .update({ credits_allocated: true })
     .eq('stripe_payment_intent_id', paymentIntentId);

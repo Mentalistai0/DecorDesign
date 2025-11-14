@@ -1,102 +1,90 @@
-# Decor Design
+# 🎨 DecorDesign - AI-Powered Interior Design Platform
 
-An AI-powered platform for furniture sellers and designers to create high-quality product visuals and videos.
+Transform your interior design ideas into reality with AI-generated images and videos.
 
-## Features
+## ✨ Features
 
-- **Image Generation**: Create realistic furniture visuals using Google's Nano Banana model
-- **Video Generation**: Generate product showcase videos using OpenAI's Sora2 model
-- **Gallery**: Store and manage all your generated content
-- **Prompt Templates**: Quick-start templates for common furniture scenes
-- **Real-time Progress**: Live progress tracking during generation
+- 🖼️ **AI Image Generation** - Transform room photos with AI-powered redesigns
+- 🎬 **AI Video Generation** - Create animated walkthroughs of your designs
+- 💳 **Credit-Based Pricing** - Flexible plans with image and video credits
+- 🔐 **Secure Authentication** - User accounts with Supabase Auth
+- 💰 **Stripe Integration** - Secure payment processing
+- 📊 **Usage Tracking** - Monitor your credit usage and history
+- 🎯 **Gallery System** - Save and organize your generated content
 
-## Tech Stack
-
-- **Frontend**: React + Vite
-- **Backend**: Node.js + Express
-- **Database**: Supabase
-- **AI APIs**: Fal.ai (Nano Banana & Sora2)
-
-## Project Structure
-
-```
-DecorDesign/
-├── frontend/          # React application
-├── backend/           # Node.js API server
-└── README.md
-```
-
-## Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js 18+
-- npm or yarn
+- Node.js 18+ and npm
 - Supabase account
+- Stripe account
 - Fal.ai API key
 
-### Installation
+### Local Development
 
-1. Clone the repository
-2. Install frontend dependencies:
-   ```bash
-   cd frontend
-   npm install
-   ```
-3. Install backend dependencies:
-   ```bash
+1. **Clone the repository**
+   \`\`\`bash
+   git clone https://github.com/yourusername/DecorDesign.git
+   cd DecorDesign
+   \`\`\`
+
+2. **Backend Setup**
+   \`\`\`bash
    cd backend
    npm install
-   ```
-4. Configure environment variables:
-   ```bash
-   # Backend
-   cd backend
    cp .env.example .env
-   # Edit .env with your API keys if needed
-
-   # Frontend (if .env.example exists)
-   cd ../frontend
-   cp .env.example .env
-   # Edit .env if needed
-   ```
-5. Start the development servers:
-   ```bash
-   # Terminal 1 - Backend
-   cd backend
+   # Edit .env with your credentials
    npm run dev
+   \`\`\`
 
-   # Terminal 2 - Frontend
+3. **Frontend Setup** (in a new terminal)
+   \`\`\`bash
    cd frontend
+   npm install
+   cp .env.example .env
+   # Edit .env with your credentials
    npm run dev
-   ```
+   \`\`\`
 
-## Environment Variables
+4. **Database Setup**
+   - Go to Supabase Dashboard
+   - Run the SQL migrations from \`/database\` folder
+   - See DEPLOYMENT.md for detailed instructions
 
-### Backend (.env)
-```
-PORT=3000
-SUPABASE_URL=your_supabase_url
-SUPABASE_ANON_KEY=your_supabase_anon_key
-FAL_API_KEY=your_fal_api_key
-```
+5. **Stripe Webhook Listener** (in a new terminal)
+   \`\`\`bash
+   stripe listen --forward-to http://localhost:3000/api/webhook
+   \`\`\`
 
-### Frontend (.env)
-```
-VITE_API_URL=http://localhost:3000
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
+6. **Open the app**
+   - Frontend: http://localhost:5173
+   - Backend: http://localhost:3000
 
-## API Endpoints
+## 📦 Tech Stack
 
-- `POST /api/generate-image` - Generate furniture image
-- `POST /api/generate-video` - Generate furniture video
-- `GET /api/gallery` - Get all generated images
-- `GET /api/videos` - Get all generated videos
-- `DELETE /api/gallery/:id` - Delete an image
-- `DELETE /api/videos/:id` - Delete a video
+### Frontend
+- React 18 with Vite
+- React Router
+- Axios
+- Tailwind CSS
+- Supabase Client
 
-## License
+### Backend
+- Node.js with Express
+- Supabase
+- Stripe
+- Fal.ai
+- Multer
 
-MIT
+## 🚀 Deployment
+
+See **DEPLOYMENT.md** for comprehensive production deployment guide.
+
+## 📄 License
+
+MIT License
+
+---
+
+**Made with ❤️ using Claude Code**

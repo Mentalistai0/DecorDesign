@@ -1,0 +1,50 @@
+.how-hero {
+  background: var(--gradient-hero);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.how-hero .container { padding: var(--space-3xl) 0; }
+.how-hero h1 { margin-bottom: var(--space-sm); }
+.how-hero p { color: var(--text-tertiary); }
+
+.how-steps { padding: var(--space-3xl) 0; }
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-xl);
+}
+
+.step-card {
+  padding: var(--space-xl);
+}
+
+.step-no {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  background: var(--primary-100);
+  color: var(--primary-700);
+  font-weight: 700;
+  margin-bottom: var(--space-md);
+}
+
+.how-cta { padding: var(--space-3xl) 0; }
+.cta-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2xl);
+}
+
+@media (max-width: 1024px) {
+  .steps-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 640px) {
+  .steps-grid { grid-template-columns: 1fr; }
+  .cta-card { flex-direction: column; gap: var(--space-lg); align-items: flex-start; }
+}
+

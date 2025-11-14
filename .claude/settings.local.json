@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(lsof:*)",
-      "Bash(kill:*)"
+      "Bash(kill:*)",
+      "Bash(brew install:*)",
+      "Bash(stripe version:*)",
+      "Bash(test:*)"
     ],
     "deny": [],
     "ask": []

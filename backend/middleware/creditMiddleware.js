@@ -3,6 +3,8 @@ import { CREDIT_COSTS, getVideoCreditCost } from '../config/stripe.js';
 
 /**
  * Middleware to check if user has enough credits for image generation
+ * IMPORTANT: This middleware now DEDUCTS credits before generation
+ * to prevent race conditions where users get free content
  */
 export async function checkImageCredits(req, res, next) {
   try {
@@ -31,7 +33,7 @@ export async function checkImageCredits(req, res, next) {
       });
     }
 
-    // Store required credits in request for later deduction
+    // Store required credits in request for tracking
     req.creditsRequired = {
       type: 'image',
       amount: requiredCredits,
@@ -146,7 +148,33 @@ export async function checkVideoCredits(req, res, next) {
 }
 
 /**
- * Helper function to be called after successful generation to deduct credits
- * This should be called in the generation route after content is successfully created
+ * Helper function to deduct credits BEFORE generation
+ * Returns a transaction ID that can be used for refunds if needed
  */
-export { deductCredits } from '../services/creditService.js';
+export { deductCredits, addCredits } from '../services/creditService.js';
+
+/**
+ * Helper function to refund credits if generation fails
+ * @param {string} userId - User's UUID
+ * @param {string} creditType - 'image' or 'video'
+ * @param {number} amount - Number of credits to refund
+ * @param {string} reason - Reason for refund
+ */
+export async function refundCredits(userId, creditType, amount, reason) {
+  try {
+    const { addCredits } = await import('../services/creditService.js');
+
+    // Add credits back based on type
+    if (creditType === 'image') {
+      await addCredits(userId, amount, 0, 'refund', reason);
+    } else if (creditType === 'video') {
+      await addCredits(userId, 0, amount, 'refund', reason);
+    }
+
+    console.log(`Refunded ${amount} ${creditType} credits to user ${userId}: ${reason}`);
+    return true;
+  } catch (error) {
+    console.error('Error refunding credits:', error);
+    return false;
+  }
+}

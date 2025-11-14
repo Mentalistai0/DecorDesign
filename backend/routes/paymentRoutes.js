@@ -1,6 +1,7 @@
 import express from 'express';
 import stripe, { stripeConfig } from '../config/stripe.js';
-import { requireAuth } from '../middleware/auth.js';
+import { authenticate } from '../middleware/auth.js';
+import { supabase, supabaseAdmin } from '../config/supabase.js';
 import {
   getPlans,
   getPlanById,
@@ -46,7 +47,7 @@ router.get('/plans', async (req, res) => {
  * Create Stripe checkout session
  * POST /api/create-checkout-session
  */
-router.post('/create-checkout-session', requireAuth, async (req, res) => {
+router.post('/create-checkout-session', authenticate, async (req, res) => {
   try {
     const { planId } = req.body;
     const userId = req.user.id;
@@ -131,8 +132,9 @@ router.post('/create-checkout-session', requireAuth, async (req, res) => {
  * Stripe webhook handler
  * POST /api/webhook
  * IMPORTANT: This endpoint must use raw body, not JSON parsed body
+ * This function is exported and mounted in server.js with raw body middleware
  */
-router.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+export async function handleStripeWebhook(req, res) {
   const sig = req.headers['stripe-signature'];
   let event;
 
@@ -162,21 +164,44 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
         const creditsImage = parseInt(session.metadata.credits_image);
         const creditsVideo = parseInt(session.metadata.credits_video);
 
-        // Record payment
-        await recordPayment({
-          user_id: userId,
-          plan_id: planId,
-          stripe_checkout_session_id: session.id,
-          stripe_payment_intent_id: session.payment_intent,
-          amount_cents: session.amount_total,
-          currency: session.currency,
-          status: 'succeeded',
-          payment_method: 'card',
-          metadata: {
-            session_id: session.id,
-            customer_email: session.customer_details?.email,
-          },
-        });
+        // CRITICAL FIX: Check idempotency - prevent duplicate credit allocation
+        const { data: existingPayment, error: checkError } = await supabaseAdmin
+          .from('stripe_payments')
+          .select('id, credits_allocated, status')
+          .eq('stripe_payment_intent_id', session.payment_intent)
+          .single();
+
+        if (checkError && checkError.code !== 'PGRST116') {
+          // PGRST116 = no rows found, which is expected for new payments
+          console.error('Error checking existing payment:', checkError);
+          throw new Error(`Failed to verify payment status: ${checkError.message}`);
+        }
+
+        if (existingPayment) {
+          if (existingPayment.credits_allocated) {
+            console.log(`⚠️ DUPLICATE WEBHOOK: Credits already allocated for payment ${session.payment_intent}`);
+            return res.json({ received: true, message: 'Already processed' });
+          }
+
+          // Payment record exists but credits not allocated - this could be a retry after failure
+          console.log(`Resuming credit allocation for payment ${session.payment_intent}`);
+        } else {
+          // Record payment (first time processing this webhook)
+          await recordPayment({
+            user_id: userId,
+            plan_id: planId,
+            stripe_checkout_session_id: session.id,
+            stripe_payment_intent_id: session.payment_intent,
+            amount_cents: session.amount_total,
+            currency: session.currency,
+            status: 'succeeded',
+            payment_method: 'card',
+            metadata: {
+              session_id: session.id,
+              customer_email: session.customer_details?.email,
+            },
+          });
+        }
 
         // Allocate credits to user
         await addCredits(
@@ -194,7 +219,7 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
         // Mark credits as allocated
         await markCreditsAllocated(session.payment_intent);
 
-        console.log(`Credits allocated: ${creditsImage} image, ${creditsVideo} video to user ${userId}`);
+        console.log(`✅ Credits allocated: ${creditsImage} image, ${creditsVideo} video to user ${userId}`);
         break;
       }
 
@@ -243,13 +268,13 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
       message: error.message,
     });
   }
-});
+}
 
 /**
  * Verify payment session
  * GET /api/verify-payment/:sessionId
  */
-router.get('/verify-payment/:sessionId', requireAuth, async (req, res) => {
+router.get('/verify-payment/:sessionId', authenticate, async (req, res) => {
   try {
     const { sessionId } = req.params;
     const userId = req.user.id;

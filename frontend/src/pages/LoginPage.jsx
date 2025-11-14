@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import './LoginPage.css'
 
 function LoginPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { login, signup } = useAuth()
   const [isLogin, setIsLogin] = useState(true)
   const [email, setEmail] = useState('')
@@ -13,6 +14,8 @@ function LoginPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [remember, setRemember] = useState(true)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -43,8 +46,10 @@ function LoginPage() {
       if (result.success) {
         setSuccess(isLogin ? 'Logged in successfully!' : 'Account created successfully!')
         setTimeout(() => {
-          navigate('/generate')
-        }, 1000)
+          const params = new URLSearchParams(location.search)
+          const redirect = params.get('redirect') || '/generate'
+          navigate(decodeURIComponent(redirect))
+        }, 800)
       } else {
         setError(result.error || 'Authentication failed')
       }
@@ -74,8 +79,22 @@ function LoginPage() {
         ))}
       </div>
       <div className="container">
-        <div className="login-container">
-          <div className="login-card card">
+        <div className="auth-layout">
+          <aside className="auth-side glass">
+            <div className="brand-row">
+              <img src="/logo.svg" alt="DecorDesign" className="brand-logo" />
+              <span className="brand-name">DecorDesign</span>
+            </div>
+            <h2>Create premium visuals in minutes</h2>
+            <ul className="benefits">
+              <li>✨ AI‑powered image/video generation</li>
+              <li>🧩 Branded templates and styles</li>
+              <li>🤝 Team collaboration</li>
+              <li>⚡ Fast, secure and reliable</li>
+            </ul>
+          </aside>
+
+          <div className="login-card card gradient-border">
             <h1>{isLogin ? 'Sign In' : 'Sign Up'}</h1>
             <p className="login-subtitle">
               {isLogin
@@ -90,38 +109,63 @@ function LoginPage() {
               {!isLogin && (
                 <div className="input-group">
                   <label htmlFor="name">Name</label>
-                  <input
-                    type="text"
-                    id="name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Enter your name"
-                  />
+                  <div className="input-with-icon">
+                    <span className="field-icon">👤</span>
+                    <input
+                      type="text"
+                      id="name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Enter your name"
+                    />
+                  </div>
                 </div>
               )}
 
               <div className="input-group">
                 <label htmlFor="email">Email</label>
-                <input
-                  type="email"
-                  id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  required
-                />
+                <div className="input-with-icon">
+                  <span className="field-icon">📧</span>
+                  <input
+                    type="email"
+                    id="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    required
+                  />
+                </div>
               </div>
 
               <div className="input-group">
                 <label htmlFor="password">Password</label>
-                <input
-                  type="password"
-                  id="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder={isLogin ? "Enter your password" : "At least 8 characters"}
-                  required
-                />
+                <div className="input-with-icon">
+                  <span className="field-icon">🔒</span>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    id="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder={isLogin ? 'Enter your password' : 'At least 8 characters'}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="toggle-pass"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    onClick={() => setShowPassword((v) => !v)}
+                  >
+                    {showPassword ? '🙈' : '👁️'}
+                  </button>
+                </div>
+              </div>
+
+              <div className="remember-row">
+                <label className="remember">
+                  <input type="checkbox" checked={remember} onChange={() => setRemember(!remember)} />
+                  <span>Remember me</span>
+                </label>
+                <button type="button" className="forgot" onClick={() => navigate('/login?reset=1')}>Forgot password?</button>
               </div>
 
               <button type="submit" className="btn btn-primary btn-full" disabled={isLoading}>
@@ -139,19 +183,12 @@ function LoginPage() {
                   {isLogin ? 'Sign Up' : 'Sign In'}
                 </span>
               </p>
+              <p className="legal-note">
+                By continuing you agree to our <a href="/terms">Terms</a> and <a href="/privacy">Privacy Policy</a>.
+              </p>
             </div>
 
-            <div className="divider">
-              <span>OR</span>
-            </div>
-
-            <button
-              type="button"
-              className="btn btn-secondary btn-full"
-              onClick={() => navigate('/generate')}
-            >
-              Continue Without Account
-            </button>
+            {/* Require account to use the app */}
           </div>
         </div>
       </div>

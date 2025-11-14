@@ -14,7 +14,7 @@ import authRoutes from './routes/authRoutes.js'
 import imageRoutes from './routes/imageRoutes.js'
 import videoRoutes from './routes/videoRoutes.js'
 import galleryRoutes from './routes/galleryRoutes.js'
-import paymentRoutes from './routes/paymentRoutes.js'
+import paymentRoutes, { handleStripeWebhook } from './routes/paymentRoutes.js'
 import creditsRoutes from './routes/creditsRoutes.js'
 
 // Load environment variables
@@ -61,7 +61,7 @@ app.use(cors({
 
 // Stripe webhook route (must be before body parsing middleware)
 // This route needs raw body for signature verification
-app.use('/api/webhook', paymentRoutes);
+app.post('/api/webhook', express.raw({ type: 'application/json' }), handleStripeWebhook);
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }))

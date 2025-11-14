@@ -2,12 +2,12 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(to bottom, var(--midnight), var(--midnight-2));
+  background: var(--background);
 }
 
 .main-content {
   flex: 1;
-  padding-top: 80px;
+  padding-top: 0;
 }
 
 /* Button Styles */
@@ -48,13 +48,13 @@
 
 .btn-primary {
   background: var(--gradient-primary);
-  color: white;
-  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.35);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.25);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 212, 255, 0.45);
+  box-shadow: 0 10px 24px rgba(124, 58, 237, 0.3);
 }
 
 .btn-primary:active {
@@ -63,14 +63,14 @@
 
 .btn-secondary {
   background-color: transparent;
-  color: #E6EAF2;
-  border: 2px solid rgba(0, 212, 255, 0.35);
+  color: var(--text-secondary);
+  border: 2px solid var(--border);
   box-shadow: var(--shadow-sm);
 }
 
 .btn-secondary:hover {
-  background-color: rgba(0, 212, 255, 0.06);
-  border-color: var(--teal);
+  background-color: var(--surface-hover);
+  border-color: var(--primary-300);
   transform: translateY(-2px);
   box-shadow: var(--shadow);
 }
@@ -111,7 +111,7 @@
 
 /* Card Styles */
 .card {
-  background: white;
+  background: var(--surface);
   border-radius: var(--radius-lg);
   padding: var(--space-xl);
   box-shadow: var(--shadow-sm);

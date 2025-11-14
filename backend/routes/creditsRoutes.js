@@ -1,5 +1,5 @@
 import express from 'express';
-import { requireAuth } from '../middleware/auth.js';
+import { authenticate } from '../middleware/auth.js';
 import {
   getUserCredits,
   getCreditTransactions,
@@ -12,7 +12,7 @@ const router = express.Router();
  * Get user's credit balance
  * GET /api/credits
  */
-router.get('/credits', requireAuth, async (req, res) => {
+router.get('/credits', authenticate, async (req, res) => {
   try {
     const userId = req.user.id;
     const credits = await getUserCredits(userId);
@@ -62,7 +62,7 @@ router.get('/credits', requireAuth, async (req, res) => {
  * Get user's credit transaction history
  * GET /api/credits/transactions?limit=50&offset=0
  */
-router.get('/credits/transactions', requireAuth, async (req, res) => {
+router.get('/credits/transactions', authenticate, async (req, res) => {
   try {
     const userId = req.user.id;
     const limit = parseInt(req.query.limit) || 50;
@@ -102,7 +102,7 @@ router.get('/credits/transactions', requireAuth, async (req, res) => {
  * Initialize credits for a new user (admin only or automatic on signup)
  * POST /api/credits/initialize
  */
-router.post('/credits/initialize', requireAuth, async (req, res) => {
+router.post('/credits/initialize', authenticate, async (req, res) => {
   try {
     const userId = req.user.id;
 

@@ -1,5 +1,5 @@
 import express from 'express';
-import { supabase } from '../middleware/auth.js';
+import { supabase } from '../config/supabase.js';
 import { apiLimiter } from '../middleware/security.js';
 
 const router = express.Router();

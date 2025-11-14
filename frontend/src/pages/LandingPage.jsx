@@ -7,13 +7,11 @@ function LandingPage() {
   const [featuresInView, setFeaturesInView] = useState(false)
   const [stepsInView, setStepsInView] = useState(false)
   const [testimonialsInView, setTestimonialsInView] = useState(false)
-  const [pricingInView, setPricingInView] = useState(false)
 
   const heroRef = useRef(null)
   const featuresRef = useRef(null)
   const stepsRef = useRef(null)
   const testimonialsRef = useRef(null)
-  const pricingRef = useRef(null)
 
   const particles = useMemo(
     () => Array.from({ length: 22 }, (_, i) => ({
@@ -66,27 +64,18 @@ function LandingPage() {
       observerOptions
     )
 
-    const pricingObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) setPricingInView(true)
-        })
-      },
-      observerOptions
-    )
+    
 
     if (heroRef.current) heroObserver.observe(heroRef.current)
     if (featuresRef.current) featuresObserver.observe(featuresRef.current)
     if (stepsRef.current) stepsObserver.observe(stepsRef.current)
     if (testimonialsRef.current) testimonialsObserver.observe(testimonialsRef.current)
-    if (pricingRef.current) pricingObserver.observe(pricingRef.current)
 
     return () => {
       heroObserver.disconnect()
       featuresObserver.disconnect()
       stepsObserver.disconnect()
       testimonialsObserver.disconnect()
-      pricingObserver.disconnect()
     }
   }, [])
 
@@ -116,18 +105,7 @@ function LandingPage() {
     return () => clearInterval(id)
   }, [visible, testimonials.length])
 
-  const [proPrice, setProPrice] = useState(0)
-  useEffect(() => {
-    let p = 0
-    const pid = setInterval(() => {
-      p += 2
-      if (p >= 49) {
-        setProPrice(49)
-        clearInterval(pid)
-      } else setProPrice(p)
-    }, 30)
-    return () => clearInterval(pid)
-  }, [])
+  
 
   return (
     <div className="landing-page">
@@ -159,7 +137,7 @@ function LandingPage() {
               Generate photorealistic product images, lifestyle scenes, and social‑ready videos in seconds. Start free today.
             </p>
             <div className="hero-buttons">
-              <Link to="/generate" className="btn btn-primary btn-lg glow-btn">Get Started Free</Link>
+              <Link to="/login" className="btn btn-primary btn-lg glow-btn">Get Started Free</Link>
             </div>
             <div className="hero-icons">
               <div className="hero-icon" aria-label="Scale your content">📈</div>
@@ -238,36 +216,7 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing */}
-      <section className="pricing" ref={pricingRef}>
-        <div className="container">
-          <h2 className={`section-title ${pricingInView ? 'animate-on-scroll animate' : 'animate-on-scroll'}`}>Start Free. Scale with Pro.</h2>
-          <div className="pricing-grid">
-            <div className={`price-card glass ${pricingInView ? 'animate-on-scroll animate' : 'animate-on-scroll animate-left'}`}>
-              <div className="price-header">Free</div>
-              <div className="price-value"><span className="currency">$</span><span className="amount">0</span><span className="period">/mo</span></div>
-              <ul className="price-features">
-                <li>50 image generations/month</li>
-                <li>Standard templates</li>
-                <li>Basic gallery</li>
-              </ul>
-              <Link to="/generate" className="btn btn-secondary btn-full">Start Free</Link>
-            </div>
-            <div className={`price-card glass popular ${pricingInView ? 'animate-on-scroll animate' : 'animate-on-scroll animate-right'}`}>
-              <div className="badge-gold">Most Popular</div>
-              <div className="price-header">Pro</div>
-              <div className="price-value"><span className="currency">$</span><span className="amount">{proPrice}</span><span className="period">/mo</span></div>
-              <ul className="price-features">
-                <li>Unlimited image generations</li>
-                <li>Premium templates</li>
-                <li>HD video + priority queue</li>
-                <li>Team seats & roles</li>
-              </ul>
-              <Link to="/login" className="btn btn-primary btn-full">Upgrade to Pro</Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      
 
       {/* FAQ */}
       <section className="faq">
@@ -287,26 +236,11 @@ function LandingPage() {
         <div className="container">
           <h2>Ready to Elevate Your Product Visuals?</h2>
           <p>Create premium AI furniture images and videos in minutes.</p>
-          <Link to="/generate" className="btn btn-primary btn-lg">Start Free</Link>
+          <Link to="/login" className="btn btn-primary btn-lg">Start Free</Link>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="footer">
-        <div className="container footer-inner">
-          <div className="footer-left">© {new Date().getFullYear()} Decor Design</div>
-          <div className="footer-links">
-            <a href="#" className="social" aria-label="LinkedIn">in</a>
-            <a href="#" className="social" aria-label="X">𝕏</a>
-            <a href="#" className="social" aria-label="YouTube">▶</a>
-          </div>
-          <div className="footer-right">
-            <a href="#">Privacy</a>
-            <a href="#">Terms</a>
-            <button className="scroll-top" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>↑</button>
-          </div>
-        </div>
-      </footer>
+      {/* Footer provided by layout */}
     </div>
   )
 }

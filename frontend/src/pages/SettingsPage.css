@@ -1,0 +1,36 @@
+.settings-page { padding: var(--space-3xl) 0; }
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-xl);
+}
+
+.page-header { text-align: center; margin-bottom: var(--space-2xl); }
+.page-header h1 { margin-bottom: var(--space-sm); }
+
+.account-info .row {
+  display: grid;
+  grid-template-columns: 140px 1fr auto;
+  gap: var(--space-md);
+  align-items: center;
+  margin-bottom: var(--space-md);
+}
+.account-info .row .value { color: var(--text-secondary); }
+.account-info input { padding: var(--space-md); border: 2px solid var(--border-light); border-radius: var(--radius-md); background: var(--surface); color: var(--text-primary); }
+
+.security-form .input-group { margin-bottom: var(--space-md); }
+
+.prefs-form { display: grid; gap: var(--space-md); }
+.switch-row { display: inline-flex; align-items: center; gap: var(--space-sm); color: var(--text-secondary); }
+
+.billing .credits { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); margin-bottom: var(--space-lg); }
+.credit-line { display: flex; justify-content: space-between; color: var(--text-secondary); }
+
+.card.danger { border: 1px solid rgba(239, 68, 68, 0.35); background: linear-gradient(180deg, rgba(239,68,68,0.08), transparent); }
+
+@media (max-width: 968px) {
+  .settings-grid { grid-template-columns: 1fr; }
+  .account-info .row { grid-template-columns: 1fr; gap: var(--space-sm); }
+}
+

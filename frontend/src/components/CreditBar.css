@@ -1,0 +1,31 @@
+.creditbar {
+  display: grid;
+  gap: var(--space-sm);
+  min-width: 220px;
+}
+
+.creditbar-compact { gap: 6px; min-width: 200px; }
+
+.cb-row { display: grid; grid-template-columns: auto 1fr auto; gap: var(--space-sm); align-items: center; }
+.cb-compact { grid-template-columns: 1fr auto; }
+
+.cb-label { color: var(--text-secondary); font-size: var(--text-sm); font-weight: 600; }
+.cb-count { color: var(--text-secondary); font-size: var(--text-sm); font-variant-numeric: tabular-nums; }
+
+.cb-track {
+  height: 8px;
+  background: var(--background-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  position: relative;
+}
+
+.cb-fill {
+  height: 100%;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 12px rgba(124,58,237,0.35);
+  transition: width .3s ease;
+}
+

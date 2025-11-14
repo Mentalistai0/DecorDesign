@@ -26,8 +26,21 @@ function GalleryPage() {
         axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/videos`),
       ])
 
-      setImages(imagesRes.data)
-      setVideos(videosRes.data)
+      const toArray = (payload) => {
+        const d = payload?.data
+        if (Array.isArray(d)) return d
+        if (Array.isArray(d?.items)) return d.items
+        if (Array.isArray(d?.data)) return d.data
+        // Some APIs return object maps; convert values if they look like items
+        if (d && typeof d === 'object') {
+          const vals = Object.values(d)
+          return Array.isArray(vals) && vals.every((v) => typeof v === 'object') ? vals : []
+        }
+        return []
+      }
+
+      setImages(toArray(imagesRes))
+      setVideos(toArray(videosRes))
     } catch (err) {
       console.error('Fetch error:', err)
       setError('Failed to load gallery items')
@@ -67,6 +80,9 @@ function GalleryPage() {
   }
 
   const currentItems = activeTab === 'images' ? images : videos
+  const safeCurrentItems = Array.isArray(currentItems) ? currentItems : []
+  const imagesCount = Array.isArray(images) ? images.length : 0
+  const videosCount = Array.isArray(videos) ? videos.length : 0
 
   return (
     <div className="gallery-page">
@@ -81,13 +97,13 @@ function GalleryPage() {
             className={`tab ${activeTab === 'images' ? 'active' : ''}`}
             onClick={() => setActiveTab('images')}
           >
-            Images ({images.length})
+            Images ({imagesCount})
           </button>
           <button
             className={`tab ${activeTab === 'videos' ? 'active' : ''}`}
             onClick={() => setActiveTab('videos')}
           >
-            Videos ({videos.length})
+            Videos ({videosCount})
           </button>
         </div>
 
@@ -98,7 +114,7 @@ function GalleryPage() {
             <div className="loading-spinner"></div>
             <p>Loading gallery...</p>
           </div>
-        ) : currentItems.length === 0 ? (
+        ) : safeCurrentItems.length === 0 ? (
           <div className="empty-gallery">
             <div className="empty-icon">
               {activeTab === 'images' ? '🖼️' : '🎬'}
@@ -118,7 +134,7 @@ function GalleryPage() {
           </div>
         ) : (
           <div className="gallery-grid">
-            {currentItems.map((item) => (
+            {safeCurrentItems.map((item) => (
               <div key={item.id} className="gallery-item">
                 <div
                   className="item-preview"
