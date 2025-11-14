@@ -14,6 +14,8 @@ import authRoutes from './routes/authRoutes.js'
 import imageRoutes from './routes/imageRoutes.js'
 import videoRoutes from './routes/videoRoutes.js'
 import galleryRoutes from './routes/galleryRoutes.js'
+import paymentRoutes from './routes/paymentRoutes.js'
+import creditsRoutes from './routes/creditsRoutes.js'
 
 // Load environment variables
 dotenv.config()
@@ -57,6 +59,10 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
+// Stripe webhook route (must be before body parsing middleware)
+// This route needs raw body for signature verification
+app.use('/api/webhook', paymentRoutes);
+
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
@@ -72,6 +78,8 @@ app.use('/api/auth', authRoutes)
 app.use('/api', imageRoutes)
 app.use('/api', videoRoutes)
 app.use('/api', galleryRoutes)
+app.use('/api', paymentRoutes)
+app.use('/api', creditsRoutes)
 
 // Health check endpoint (detailed)
 app.get('/health', (req, res) => {
@@ -84,6 +92,7 @@ app.get('/health', (req, res) => {
     checks: {
       supabase: !!process.env.SUPABASE_URL && !!process.env.SUPABASE_ANON_KEY,
       fal: !!process.env.FAL_API_KEY,
+      stripe: !!process.env.STRIPE_SECRET_KEY,
     }
   };
 

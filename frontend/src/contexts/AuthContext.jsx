@@ -9,6 +9,10 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem('access_token'));
+  const [credits, setCredits] = useState({
+    image: { total: 0, used: 0, available: 0 },
+    video: { total: 0, used: 0, available: 0 },
+  });
 
   // Configure axios defaults
   useEffect(() => {
@@ -18,6 +22,30 @@ export const AuthProvider = ({ children }) => {
       delete axios.defaults.headers.common['Authorization'];
     }
   }, [token]);
+
+  // Fetch user credits
+  const fetchCredits = async () => {
+    if (!token) return;
+
+    try {
+      const response = await axios.get(`${API_URL}/api/credits`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (response.data.success) {
+        setCredits(response.data.credits);
+      }
+    } catch (error) {
+      console.error('Failed to fetch credits:', error);
+      // Initialize with zeros if fetch fails
+      setCredits({
+        image: { total: 0, used: 0, available: 0 },
+        video: { total: 0, used: 0, available: 0 },
+      });
+    }
+  };
 
   // Check if user is logged in on mount
   useEffect(() => {
@@ -39,6 +67,9 @@ export const AuthProvider = ({ children }) => {
         if (response.data.success) {
           setUser(response.data.user);
           setToken(storedToken);
+
+          // Fetch user credits after authentication
+          await fetchCredits();
         } else {
           // Token is invalid
           localStorage.removeItem('access_token');
@@ -77,6 +108,9 @@ export const AuthProvider = ({ children }) => {
         setUser(newUser);
         setToken(session.access_token);
 
+        // Fetch user credits
+        await fetchCredits();
+
         return { success: true, user: newUser };
       }
     } catch (error) {
@@ -106,6 +140,9 @@ export const AuthProvider = ({ children }) => {
         setUser(loggedInUser);
         setToken(session.access_token);
 
+        // Fetch user credits
+        await fetchCredits();
+
         return { success: true, user: loggedInUser };
       }
     } catch (error) {
@@ -134,6 +171,10 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem('refresh_token');
       setUser(null);
       setToken(null);
+      setCredits({
+        image: { total: 0, used: 0, available: 0 },
+        video: { total: 0, used: 0, available: 0 },
+      });
     }
   };
 
@@ -200,10 +241,12 @@ export const AuthProvider = ({ children }) => {
     token,
     loading,
     isAuthenticated: !!user,
+    credits,
     signup,
     login,
     logout,
     refreshToken,
+    refreshCredits: fetchCredits,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,13 +1,14 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { AuthProvider } from './contexts/AuthContext'
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import { AuthProvider } from './contexts/AuthContext'
 import Navbar from './components/Navbar'
 import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 import GeneratePage from './pages/GeneratePage'
 import GalleryPage from './pages/GalleryPage'
 import VideoPage from './pages/VideoPage'
+import PricingPage from './pages/PricingPage'
+import PaymentSuccessPage from './pages/PaymentSuccessPage'
 import './App.css'
 
 function PageTransition({ children }) {
@@ -58,6 +59,8 @@ function AppContent() {
             <Route path="/generate" element={<PageTransition><GeneratePage /></PageTransition>} />
             <Route path="/gallery" element={<PageTransition><GalleryPage /></PageTransition>} />
             <Route path="/video" element={<PageTransition><VideoPage /></PageTransition>} />
+            <Route path="/pricing" element={<PageTransition><PricingPage /></PageTransition>} />
+            <Route path="/payment/success" element={<PageTransition><PaymentSuccessPage /></PageTransition>} />
           </Routes>
         </div>
       </main>
@@ -69,23 +72,9 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="app">
-          <Navbar />
-          <main className="main-content">
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/generate" element={<GeneratePage />} />
-              <Route path="/gallery" element={<GalleryPage />} />
-              <Route path="/video" element={<VideoPage />} />
-            </Routes>
-          </main>
-        </div>
+        <AppContent />
       </Router>
     </AuthProvider>
-    <Router>
-      <AppContent />
-    </Router>
   )
 }
 

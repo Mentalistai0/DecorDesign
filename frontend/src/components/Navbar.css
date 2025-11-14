@@ -185,6 +185,38 @@
   box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
 }
 
+.nav-credits {
+  display: flex;
+  align-items: center;
+}
+
+.credits-display {
+  display: flex;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(0, 212, 255, 0.1);
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+}
+
+.credit-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.credit-icon {
+  font-size: var(--text-base);
+}
+
+.credit-value {
+  color: var(--teal);
+  font-weight: 700;
+  font-size: var(--text-sm);
+  min-width: 20px;
+  text-align: center;
+}
+
 .nav-user-info {
   display: flex;
   align-items: center;
