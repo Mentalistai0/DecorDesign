@@ -17,6 +17,7 @@ function VideoPage() {
   const [progress, setProgress] = useState(0)
   const [generatedVideo, setGeneratedVideo] = useState(null)
   const [error, setError] = useState('')
+  const [durationSec, setDurationSec] = useState(4)
 
   // Check if coming from gallery with a source image
   useEffect(() => {
@@ -88,6 +89,7 @@ function VideoPage() {
         formData.append('imageUrl', imageUrl)
       }
       formData.append('prompt', prompt)
+      formData.append('duration', String(durationSec))
 
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/generate-video`,
@@ -198,6 +200,19 @@ function VideoPage() {
               </div>
 
               {error && <div className="error-message">{error}</div>}
+
+              <div className="input-group">
+                <label htmlFor="duration">Duration</label>
+                <select
+                  id="duration"
+                  value={durationSec}
+                  onChange={(e) => setDurationSec(parseInt(e.target.value, 10))}
+                >
+                  <option value={4}>4 seconds</option>
+                  <option value={8}>8 seconds</option>
+                  <option value={12}>12 seconds</option>
+                </select>
+              </div>
 
               <div className="generation-notice">
                 <p>

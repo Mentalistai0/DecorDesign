@@ -1,10 +1,21 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import axios from 'axios'
 import { imagePromptTemplates } from '../utils/promptTemplates'
 import LoadingSpinner from '../components/LoadingSpinner'
 import './GeneratePage.css'
 
 function GeneratePage() {
+  const particles = useMemo(
+    () => Array.from({ length: 15 }, (_, i) => ({
+      id: i,
+      left: Math.floor(Math.random() * 100),
+      size: Math.floor(Math.random() * 3) + 1,
+      duration: Math.floor(Math.random() * 15) + 10,
+      delay: Math.floor(Math.random() * 8),
+      opacity: (Math.random() * 0.3 + 0.2).toFixed(2),
+    })),
+    []
+  )
   const [imageSource, setImageSource] = useState('upload')
   const [imageFile, setImageFile] = useState(null)
   const [imageUrl, setImageUrl] = useState('')
@@ -102,6 +113,22 @@ function GeneratePage() {
 
   return (
     <div className="generate-page">
+      <div className="particles-bg">
+        {particles.map((p) => (
+          <div
+            key={p.id}
+            className="particle-float"
+            style={{
+              left: `${p.left}%`,
+              width: `${p.size}px`,
+              height: `${p.size}px`,
+              animationDuration: `${p.duration}s`,
+              animationDelay: `${p.delay}s`,
+              opacity: p.opacity,
+            }}
+          />
+        ))}
+      </div>
       <div className="container">
         <div className="page-header">
           <h1>Generate Furniture Image</h1>

@@ -58,6 +58,21 @@ function LoginPage() {
 
   return (
     <div className="login-page">
+      <div className="particle-bg">
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="particle"
+            style={{
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 20}s`,
+              animationDuration: `${15 + Math.random() * 10}s`,
+              width: `${2 + Math.random() * 4}px`,
+              height: `${2 + Math.random() * 4}px`,
+            }}
+          />
+        ))}
+      </div>
       <div className="container">
         <div className="login-container">
           <div className="login-card card">
