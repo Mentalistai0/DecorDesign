@@ -8,7 +8,7 @@ const router = express.Router()
 
 router.post('/generate-video', upload.single('image'), async (req, res) => {
   try {
-    const { prompt, imageUrl } = req.body
+    const { prompt, imageUrl, resolution = 'auto', aspect_ratio = 'auto', duration = 4, delete_video = true } = req.body
     const imageFile = req.file
 
     if (!prompt) {
@@ -31,9 +31,17 @@ router.post('/generate-video', upload.single('image'), async (req, res) => {
     console.log('Image input:', imageInput)
 
     // Call Fal.ai service
+    const allowedDurations = [4, 8, 12]
+    const parsedDuration = Number(duration)
+    const finalDuration = allowedDurations.includes(parsedDuration) ? parsedDuration : 4
+
     const result = await generateVideo({
       imageUrl: imageInput,
       prompt: prompt,
+      resolution,
+      aspectRatio: aspect_ratio,
+      duration: finalDuration,
+      deleteVideo: delete_video === 'false' ? false : delete_video === 'true' ? true : !!delete_video,
     })
 
     // Save to Supabase videos table
