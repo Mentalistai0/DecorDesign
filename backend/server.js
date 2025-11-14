@@ -6,7 +6,11 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import fs from 'fs'
 
+// Import security middleware
+import { configureHelmet, apiLimiter } from './middleware/security.js'
+
 // Import routes
+import authRoutes from './routes/authRoutes.js'
 import imageRoutes from './routes/imageRoutes.js'
 import videoRoutes from './routes/videoRoutes.js'
 import galleryRoutes from './routes/galleryRoutes.js'
@@ -26,23 +30,65 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir)
 }
 
-// Middleware
-app.use(cors())
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
+// Security Middleware
+app.use(configureHelmet())
+
+// CORS Configuration - restrict to frontend domain
+const allowedOrigins = [
+  'http://localhost:5173', // Vite dev server
+  'http://localhost:3000', // Alternative frontend port
+  process.env.FRONTEND_URL, // Production frontend URL
+].filter(Boolean); // Remove undefined values
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, Postman, etc.)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.warn(`CORS blocked request from origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
+// Body parsing middleware
+app.use(express.json({ limit: '10mb' }))
+app.use(express.urlencoded({ extended: true, limit: '10mb' }))
+
+// Apply rate limiting to all API routes
+app.use('/api', apiLimiter)
 
 // Serve static files from uploads directory
 app.use('/uploads', express.static(uploadsDir))
 
 // Routes
+app.use('/api/auth', authRoutes)
 app.use('/api', imageRoutes)
 app.use('/api', videoRoutes)
 app.use('/api', galleryRoutes)
 
-// Health check
+// Health check endpoint (detailed)
 app.get('/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Decor Design API is running' })
-})
+  const health = {
+    status: 'OK',
+    message: 'Decor Design API is running',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'development',
+    checks: {
+      supabase: !!process.env.SUPABASE_URL && !!process.env.SUPABASE_ANON_KEY,
+      fal: !!process.env.FAL_API_KEY,
+    }
+  };
+
+  res.json(health);
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {

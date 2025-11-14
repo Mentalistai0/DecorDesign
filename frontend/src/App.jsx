@@ -1,3 +1,5 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { AuthProvider } from './contexts/AuthContext'
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import Navbar from './components/Navbar'
@@ -65,6 +67,22 @@ function AppContent() {
 
 function App() {
   return (
+    <AuthProvider>
+      <Router>
+        <div className="app">
+          <Navbar />
+          <main className="main-content">
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/generate" element={<GeneratePage />} />
+              <Route path="/gallery" element={<GalleryPage />} />
+              <Route path="/video" element={<VideoPage />} />
+            </Routes>
+          </main>
+        </div>
+      </Router>
+    </AuthProvider>
     <Router>
       <AppContent />
     </Router>

@@ -1,28 +1,58 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
 import './LoginPage.css'
 
 function LoginPage() {
   const navigate = useNavigate()
+  const { login, signup } = useAuth()
   const [isLogin, setIsLogin] = useState(true)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [name, setName] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
     setSuccess('')
+    setIsLoading(true)
 
-    // For v1, this is a placeholder - authentication is optional
-    if (email && password) {
-      setSuccess('Authentication is optional in v1. You can start creating!')
-      setTimeout(() => {
-        navigate('/generate')
-      }, 1500)
-    } else {
-      setError('Please fill in all fields')
+    try {
+      if (!email || !password) {
+        setError('Please fill in all fields')
+        setIsLoading(false)
+        return
+      }
+
+      if (!isLogin && password.length < 8) {
+        setError('Password must be at least 8 characters long')
+        setIsLoading(false)
+        return
+      }
+
+      let result
+      if (isLogin) {
+        result = await login(email, password)
+      } else {
+        result = await signup(email, password, name)
+      }
+
+      if (result.success) {
+        setSuccess(isLogin ? 'Logged in successfully!' : 'Account created successfully!')
+        setTimeout(() => {
+          navigate('/generate')
+        }, 1000)
+      } else {
+        setError(result.error || 'Authentication failed')
+      }
+    } catch (err) {
+      setError('An unexpected error occurred')
+      console.error('Auth error:', err)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -53,23 +83,23 @@ function LoginPage() {
                 : 'Create an account to get started'}
             </p>
 
-            <div className="auth-notice">
-              <p>
-                <strong>Note:</strong> Authentication is optional in v1. You can skip this and go
-                directly to{' '}
-                <span
-                  onClick={() => navigate('/generate')}
-                  style={{ color: 'var(--primary-color)', cursor: 'pointer', textDecoration: 'underline' }}
-                >
-                  Generate Page
-                </span>
-              </p>
-            </div>
-
             {error && <div className="error-message">{error}</div>}
             {success && <div className="success-message">{success}</div>}
 
             <form onSubmit={handleSubmit}>
+              {!isLogin && (
+                <div className="input-group">
+                  <label htmlFor="name">Name</label>
+                  <input
+                    type="text"
+                    id="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Enter your name"
+                  />
+                </div>
+              )}
+
               <div className="input-group">
                 <label htmlFor="email">Email</label>
                 <input
@@ -78,6 +108,7 @@ function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
+                  required
                 />
               </div>
 
@@ -88,12 +119,13 @@ function LoginPage() {
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
+                  placeholder={isLogin ? "Enter your password" : "At least 8 characters"}
+                  required
                 />
               </div>
 
-              <button type="submit" className="btn btn-primary btn-full">
-                {isLogin ? 'Sign In' : 'Sign Up'}
+              <button type="submit" className="btn btn-primary btn-full" disabled={isLoading}>
+                {isLoading ? (isLogin ? 'Signing In...' : 'Creating Account...') : (isLogin ? 'Sign In' : 'Sign Up')}
               </button>
             </form>
 

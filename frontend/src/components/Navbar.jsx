@@ -1,13 +1,21 @@
 import { useState, useEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
 import './Navbar.css'
 
 function Navbar() {
   const location = useLocation()
+  const navigate = useNavigate()
+  const { user, isAuthenticated, logout } = useAuth()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const isActive = (path) => location.pathname === path
+
+  const handleLogout = async () => {
+    await logout()
+    navigate('/')
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -77,14 +85,30 @@ function Navbar() {
               Gallery
             </Link>
           </li>
-          <li>
-            <Link
-              to="/login"
-              className="btn btn-primary btn-sm"
-            >
-              Sign In
-            </Link>
-          </li>
+          {isAuthenticated ? (
+            <>
+              <li className="nav-user-info">
+                <span className="user-name">{user?.name || user?.email}</span>
+              </li>
+              <li>
+                <button
+                  onClick={handleLogout}
+                  className="btn btn-secondary btn-sm"
+                >
+                  Logout
+                </button>
+              </li>
+            </>
+          ) : (
+            <li>
+              <Link
+                to="/login"
+                className="btn btn-primary btn-sm"
+              >
+                Sign In
+              </Link>
+            </li>
+          )}
         </ul>
       </div>
     </nav>
