@@ -2,22 +2,23 @@ import express from 'express'
 import { upload } from '../config/multer.js'
 import { generateImage } from '../services/falService.js'
 import { supabase } from '../config/supabase.js'
+import { generationLimiter, validateImageGeneration } from '../middleware/security.js'
+import { optionalAuth } from '../middleware/auth.js'
 import fs from 'fs'
 
 const router = express.Router()
 
-router.post('/generate-image', upload.single('image'), async (req, res) => {
-  try {
-    const { prompt, imageUrl } = req.body
-    const imageFile = req.file
-
-    if (!prompt) {
-      return res.status(400).json({ error: 'Prompt is required' })
-    }
-
-    if (!imageFile && !imageUrl) {
-      return res.status(400).json({ error: 'Image file or URL is required' })
-    }
+router.post(
+  '/generate-image',
+  generationLimiter,
+  optionalAuth,
+  upload.single('image'),
+  validateImageGeneration,
+  async (req, res) => {
+    try {
+      const { prompt, imageUrl } = req.body
+      const imageFile = req.file
+      const userId = req.user?.id || null
 
     // Prepare image input for Fal.ai
     let imageInput
@@ -37,7 +38,7 @@ router.post('/generate-image', upload.single('image'), async (req, res) => {
       prompt: prompt,
     })
 
-    // Save to Supabase gallery
+    // Save to Supabase gallery with user association
     if (supabase) {
       try {
         const { data, error } = await supabase
@@ -47,6 +48,7 @@ router.post('/generate-image', upload.single('image'), async (req, res) => {
               url: result.imageUrl,
               prompt: prompt,
               source_url: imageInput,
+              user_id: userId, // Associate with authenticated user (null if anonymous)
             },
           ])
           .select()
@@ -70,17 +72,18 @@ router.post('/generate-image', upload.single('image'), async (req, res) => {
       }
     }
 
-    res.json({
-      success: true,
-      imageUrl: result.imageUrl,
-      prompt: prompt,
-    })
-  } catch (error) {
-    console.error('Image generation error:', error)
-    res.status(500).json({
-      error: error.message || 'Failed to generate image',
-    })
+      res.json({
+        success: true,
+        imageUrl: result.imageUrl,
+        prompt: prompt,
+      })
+    } catch (error) {
+      console.error('Image generation error:', error)
+      res.status(500).json({
+        error: error.message || 'Failed to generate image',
+      })
+    }
   }
-})
+)
 
 export default router
