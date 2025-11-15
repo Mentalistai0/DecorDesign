@@ -16,6 +16,7 @@ import videoRoutes from './routes/videoRoutes.js'
 import galleryRoutes from './routes/galleryRoutes.js'
 import paymentRoutes, { handleStripeWebhook } from './routes/paymentRoutes.js'
 import creditsRoutes from './routes/creditsRoutes.js'
+import adminRoutes from './routes/adminRoutes.js'
 
 // Load environment variables
 dotenv.config()
@@ -89,6 +90,7 @@ app.use('/api', videoRoutes)
 app.use('/api', galleryRoutes)
 app.use('/api', paymentRoutes)
 app.use('/api', creditsRoutes)
+app.use('/api/admin', adminRoutes)
 
 // Health check endpoint (detailed)
 app.get('/health', (req, res) => {
