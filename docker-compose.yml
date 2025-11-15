@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: decor-design
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend/uploads:/app/backend/uploads
+      - ./logs:/app/logs
+    networks:
+      - decor-network
+
+networks:
+  decor-network:
+    driver: bridge
